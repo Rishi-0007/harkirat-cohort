@@ -3,14 +3,13 @@
 
 import express from "express";
 import jwt from "jsonwebtoken";
-import cors from "cors";
 
 const app = express();
 const JWT_SECRET = "ilovecode";
 
 const users = [];
 
-app.use(express.json(), cors());
+app.use(express.json());
 
 function findUser(username) {
     const found = users.find(u => u.username == username);
@@ -35,6 +34,10 @@ function auth(req, res, next) {
         });
     }
 };
+
+app.get("/", (req, res) => {
+    res.sendFile("/home/rishi/code/harkirat-cohort/week6/auth-website/public/index.html");
+})
 
 app.post("/signup", (req, res) => {
     const { username, password } = req.body;
