@@ -1,6 +1,8 @@
 import mongoose, { Schema } from "mongoose";
+import dotenv from "dotenv";
 
-mongoose.connect("mongodb+srv://rishikn:FEFr9A9kZDjcJ0yC@cluster0.dwocy.mongodb.net/todo-app");
+dotenv.config();
+mongoose.connect(process.env.DB_URL);
 
 const users = new Schema({
     name: String,
