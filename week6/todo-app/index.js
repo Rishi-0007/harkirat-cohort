@@ -1,6 +1,8 @@
-import express from "express";
+import express, { json } from "express";
 import jwt from "jsonwebtoken";
 import { UserModel, TodoModel } from "./db.js";
+import bcrypt from "bcrypt";
+import { z } from "zod";
 
 const app = express();
 const JWT_SECRET = "s3cret";
@@ -20,30 +22,55 @@ function auth(req, res, next) {
     }
 }
 
+const userSchema = z.object({
+    name: z.string().min(3),
+    email: z.string().min(3).email(),
+    password: z.string().min(6)
+})
+
 app.post("/signup", async (req, res) => {
-    const { name, email, password } = req.body;
+    try {
+        const { name, email, password } = req.body;
 
-    await UserModel.create
-        ({
-            name: name,
-            email: email,
-            password: password
-        });
+        const result = userSchema.safeParse(req.body);
 
-    res.json({
-        message: "Sign up successful!"
-    })
+        if (result.success) {
+
+            const hashedPassword = await bcrypt.hash(password, 5);
+
+            await UserModel.create
+                ({
+                    name: name,
+                    email: email,
+                    password: hashedPassword
+                });
+
+            res.json({
+                message: "Sign up successful!"
+            })
+        }
+        else {
+            res.status(400).json({
+                message: JSON.parse(result.error.message)
+            })
+        }
+    } catch (err) {
+        res.status(400).json({
+            message: "User already exists"
+        })
+    }
 })
 
 app.post("/signin", async (req, res) => {
     const { email, password } = req.body;
 
     const user = await UserModel.findOne({
-        email: email,
-        password: password
+        email: email
     })
 
-    if (user) {
+    const isPasswordCorrect = bcrypt.compare(password, user.password);
+
+    if (user && isPasswordCorrect) {
         const token = jwt.sign({
             id: user._id.toString()  // convert to string because id is of type ObjectID
         }, JWT_SECRET);
