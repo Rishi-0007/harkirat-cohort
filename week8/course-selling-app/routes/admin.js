@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 import { AdminModel } from "../db.js";
 
 dotenv.config();
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_ADMIN_SECRET;
 
 const adminRouter = Router();
 
@@ -53,12 +53,12 @@ adminRouter.post("/signin", async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        const user = await AdminModel.findOne({ email });
-        if (!user) {
-            return res.status(403).json({ message: "User not found" });
+        const admin = await AdminModel.findOne({ email });
+        if (!admin) {
+            return res.status(403).json({ message: "Admin not found" });
         }
 
-        const isPasswordCorrect = await bcrypt.compare(password, user.password);
+        const isPasswordCorrect = await bcrypt.compare(password, admin.password);
         if (!isPasswordCorrect) {
             return res.status(403).json({ message: "Incorrect credentials" });
         }
@@ -68,6 +68,24 @@ adminRouter.post("/signin", async (req, res) => {
     } catch (err) {
         res.status(500).json({ message: "Something went wrong" });
     }
+})
+
+// to add course
+adminRouter.post("/course", (req, res) => {
+    res.json({
+
+    })
+})
+
+adminRouter.put("/course", (req, res) => {
+    res.json({
+
+    })
+})
+
+// get all courses 
+adminRouter.get("/course/bulk", (req, res) => {
+
 })
 
 export { adminRouter };

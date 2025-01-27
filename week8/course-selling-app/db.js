@@ -23,10 +23,12 @@ const Course = new Schema({
     creatorID: Schema.ObjectId
 })
 
-const Purchases = new Schema({
-    courseID: Schema.ObjectId,
-    userID: Schema.ObjectId
+const Purchase = new Schema({
+    userID: Schema.ObjectId,
+    courseID: Schema.ObjectId
 })
 
-export const UserModel = mongoose.model("users", User);
+export const UserModel = mongoose.model("user", User);
 export const AdminModel = mongoose.model("admin", Admin);
+export const CourseModel = mongoose.model("course", Course);
+export const PurchasesModel = mongoose.model("purchase", Purchase);
